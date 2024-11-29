@@ -147,6 +147,7 @@
     <div class="container">
         <h1 id="title">Caméra de Surveillance</h1>
         <div class="layout">
+            <!-- Gestion port -->
             <div class="port-controls">
                 <label id="port-label" for="port">Sélection du port</label>
                 <select id="port">
@@ -160,6 +161,7 @@
                     <button id="auto-mode">Mode Automatique</button>
                 </div>
             </div>
+            <!-- Contrôle directions -->
             <div class="direction-controls">
                 <div class="direction-grid">
                     <div></div>
@@ -194,6 +196,7 @@
     </div>
 
     <script>
+        // Liste des mots-clés pour chaque langue
         const translations = {
             fr: {
                 title: "Caméra de Surveillance",
@@ -299,6 +302,7 @@
             },
         };
 
+        // Fonction pour mettre à jour la langue
         const updateTexts = (language) => {
             const t = translations[language];
             document.getElementById("title").textContent = t.title;
@@ -316,13 +320,16 @@
             document.getElementById("zoom-label").textContent = t.zoomLabel;
         };
 
+        // Initialisation du client WebSokcet
         const ws = new WebSocket("ws://localhost:12345");
-
         ws.onopen = () => console.log("WebSocket connecté");
         ws.onclose = () => console.log("WebSocket déconnecté");
+
+        // Fonction appelée lorsque le client reçoit un message du serveur
         ws.onmessage = (event) => {
             console.log("Message reçu du serveur :", event.data);
 
+            // Port ouvert ?
             if (event.data == "OPEN_PORT_SUCCESS")
             {
                 document.getElementById("port-status").textContent = translations[document.getElementById("language").value].portStatusSuccess;
@@ -333,6 +340,7 @@
             }
         };
 
+        // Fonction pour envoyer un message (dans ce contexte, une commande) au serveur
         const sendCommand = (command) => {
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(command);
@@ -341,6 +349,7 @@
             }
         };
 
+        // Commandes statiques
         document.getElementById("power").addEventListener("click", () => sendCommand("POWER_ON"));
         document.getElementById("initialize").addEventListener("click", () => sendCommand("INITIALIZE"));
         document.getElementById("auto-mode").addEventListener("click", () => sendCommand("AUTO_MODE"));
@@ -348,14 +357,14 @@
         document.getElementById("down").addEventListener("click", () => sendCommand("MOVE_DOWN"));
         document.getElementById("left").addEventListener("click", () => sendCommand("MOVE_LEFT"));
         document.getElementById("right").addEventListener("click", () => sendCommand("MOVE_RIGHT"));
+        document.getElementById("language").addEventListener("change", (e) => updateTexts(e.target.value));
+
+        // Commandes dynamiques
         document.getElementById("zoom").addEventListener("input", (e) => {
             const zoomValue = e.target.value;
             document.getElementById("zoom-value").textContent = `${zoomValue}%`;
             sendCommand(`ZOOM_${zoomValue}`);
         });
-
-        document.getElementById("language").addEventListener("change", (e) => updateTexts(e.target.value));
-
         document.getElementById("open-port").addEventListener("click", () => {
             const selectedPort = document.getElementById("port").value;
             const portCommand = `OPEN_PORT_${selectedPort.replace(" ", "_").toUpperCase()}`;
