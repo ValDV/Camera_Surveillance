@@ -1,11 +1,11 @@
 #pragma once
 
-#include <QtWidgets/QMainWindow>
+#include <QObject>
 #include <QSerialPort>
 #include "ControleCamera.h"
 #include "WebSocketServer.h"
 
-class CameraDeSurveillance : public QMainWindow
+class CameraDeSurveillance : public QObject
 {
     Q_OBJECT
 

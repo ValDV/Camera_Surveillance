@@ -38,11 +38,11 @@ WebSocketServer::~WebSocketServer()
 bool WebSocketServer::startServer(quint16 port)
 {
     if (!server->listen(QHostAddress::Any, port)) {
-        std::cout << "Echec du démarrage du serveur WebSocket: " << server->errorString().toStdString() << std::endl;
+        std::cout << "Echec du demarrage du serveur WebSocket: " << server->errorString().toStdString() << std::endl;
         return false;
     }
     connect(server, &QWebSocketServer::newConnection, this, &WebSocketServer::onNewConnection);
-    std::cout << "Serveur WebSocket en écoute sur le port " << port << std::endl;
+    std::cout << "Serveur WebSocket en ecoute sur le port " << port << std::endl;
     return true;
 }
 
@@ -59,7 +59,7 @@ void WebSocketServer::onNewConnection()
     clients.append(client);
     connect(client, &QWebSocket::textMessageReceived, this, &WebSocketServer::onTextMessageReceived);
     connect(client, &QWebSocket::disconnected, this, &WebSocketServer::onClientDisconnected);
-    std::cout << "Nouvelle connexion établie." << std::endl;
+    std::cout << "Nouvelle connexion etablie." << std::endl;
 }
 
 //---------------------------------------------------------------------------------------------
@@ -72,7 +72,7 @@ void WebSocketServer::onNewConnection()
 void WebSocketServer::onTextMessageReceived(const QString& message)
 {
     QWebSocket* senderClient = qobject_cast<QWebSocket*>(sender());
-    std::cout << "Message reçu de client: " << message.toStdString() << std::endl;
+    std::cout << "Message client recu: " << message.toStdString() << std::endl;
 
     // Message était-il une commande ?
     if (message == "POWER_ON") cameraControl->powerON();
@@ -97,7 +97,7 @@ void WebSocketServer::onTextMessageReceived(const QString& message)
         QString portString = message.mid(10).replace("_", " ");
         QSerialPort* port = new QSerialPort(portString);
         if (cameraControl->openPort(port)) {
-            std::cout << "Port ouvert avec succès: " << portString.toStdString() << std::endl;
+            std::cout << "Port ouvert avec succes: " << portString.toStdString() << std::endl;
             if (senderClient) {
                 senderClient->sendTextMessage("OPEN_PORT_SUCCESS");
             }
@@ -127,5 +127,5 @@ void WebSocketServer::onClientDisconnected()
         clients.removeAll(client);
         client->deleteLater();
     }
-    std::cout << "Client déconnecté." << std::endl;
+    std::cout << "Client deconnecte." << std::endl;
 }
